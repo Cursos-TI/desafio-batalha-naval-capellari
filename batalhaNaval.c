@@ -11,7 +11,48 @@ int main(){
     int conflito = 0;
     int matriz[LINHAS][COLUNAS];
 
-    //preenchendo a matriz com 0
+       int matriz_cone[5][5];
+        int matriz_cruz[5][5];
+        int matriz_octaedro[5][5];
+
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (i == 0 && j == 2) {
+                    matriz_cone[i][j] = 1;
+                } else if (i == 1 && (j >= 1 && j <= 3)) {
+                    matriz_cone[i][j] = 1;
+                } else if (i == 2 && (j >= 0 && j <= 4)) {
+                    matriz_cone[i][j] = 1;
+                } else {
+                    matriz_cone[i][j] = 0;
+                }
+            }
+        }
+
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (i == 2 || j == 2) {
+                    matriz_cruz[i][j] = 1;
+                } else {
+                    matriz_cruz[i][j] = 0;
+                }
+            }
+        }
+
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                int distancia_linha_centro = i - 2;
+                if (distancia_linha_centro < 0) distancia_linha_centro = -distancia_linha_centro;
+                int distancia_coluna_centro = j - 2;
+                if (distancia_coluna_centro < 0) distancia_coluna_centro = -distancia_coluna_centro;
+                if ( (distancia_linha_centro + distancia_coluna_centro) <= 2 ) {
+                    matriz_octaedro[i][j] = 1;
+                } else {
+                    matriz_octaedro[i][j] = 0;
+                }
+            }
+        }
+
     for(int i =0; i<LINHAS;i++){
         for(int j=0;j<COLUNAS;j++){
              matriz[i][j] = 0;
@@ -85,47 +126,71 @@ int main(){
 
     }
 
-    //codigo comentado para exibir a logica inicial
-    //codigo comentado para que futuramente seja necessario tratar cada navio individualmente
-    /*
-    //aqui mantenho a linha do navio e vou percorrendo as colunas para preencher na horizontal
-    for(int i=0;i<3;i++){
-        matriz[linha_navio_horizontal][coluna_navio_horizontal] = 3;
-        coluna_navio_horizontal++;
-    }
+    // pontos de origem das habilidades (linha, coluna)
+    // Ajustados para acertar alguns navios
+    int origem_cone_linha = 2;
+    int origem_cone_coluna = 5;
 
-    //aqui mantenho a coluna do navio e vou percorrendo as linhas para preencher na vertical
-    for(int j=0;j<3;j++){
-        if( matriz[linha_navio_vertical][coluna_navio_vertical] == 3){
-            conflito = 1;
-        }
-        matriz[linha_navio_vertical][coluna_navio_vertical] = 3;
-        linha_navio_vertical++;
-    }
+    int origem_cruz_linha = 7;
+    int origem_cruz_coluna = 2;
 
-    //navio diagonal
-    //incue o navio para diagonal, baixo esquerda a partir da linha e coluna definida
-    for(int j=0;j<3;j++){
-        if( matriz[linha_navio_diagonal_1][coluna_navio_diagonal_1] == 3){
-            conflito = 1;
-            break;
-        }
-        matriz[linha_navio_diagonal_1][coluna_navio_diagonal_1] = 3;
-        linha_navio_diagonal_1++;
-        coluna_navio_diagonal_1--;
-    }
+    int origem_octaedro_linha = 8;
+    int origem_octaedro_coluna = 6;
 
-    for(int j=0;j<3;j++){
-        if( matriz[linha_navio_diagonal_2][coluna_navio_diagonal_2] == 3){
-            conflito = 1;
-            printf("Posicao do erro: [%d] - [%d]",linha_navio_diagonal_2,coluna_navio_diagonal_2);
-            break;
+        // sobrepor matriz_cone no tabuleiro, centrando no ponto de origem
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                int tabuleiro_linha = origem_cone_linha - 2 + i;
+                int tabuleiro_coluna = origem_cone_coluna - 2 + j;
+                // Se está dentro do tabuleiro e é área de efeito da habilidade cone
+                if (tabuleiro_linha >= 0 && tabuleiro_linha < LINHAS && tabuleiro_coluna >= 0 && tabuleiro_coluna < COLUNAS) {
+                    if (matriz_cone[i][j] == 1) {
+                        if (matriz[tabuleiro_linha][tabuleiro_coluna] == 3) {
+                            matriz[tabuleiro_linha][tabuleiro_coluna] = 5; // acertou navio
+                        } else if (matriz[tabuleiro_linha][tabuleiro_coluna] == 0) {
+                            matriz[tabuleiro_linha][tabuleiro_coluna] = 1; // acertou água
+                        }
+                    }
+                }
+            }
         }
-        matriz[linha_navio_diagonal_2][coluna_navio_diagonal_2] = 3;
-        linha_navio_diagonal_2--;
-        coluna_navio_diagonal_2++;
-    }
-    */
+
+        // sobrepor matriz_cruz no tabuleiro, centrando no ponto de origem
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                int tabuleiro_linha = origem_cruz_linha - 2 + i;
+                int tabuleiro_coluna = origem_cruz_coluna - 2 + j;
+                // Se está dentro do tabuleiro e é área de efeito da habilidade cruz
+                if (tabuleiro_linha >= 0 && tabuleiro_linha < LINHAS && tabuleiro_coluna >= 0 && tabuleiro_coluna < COLUNAS) {
+                    if (matriz_cruz[i][j] == 1) {
+                        if (matriz[tabuleiro_linha][tabuleiro_coluna] == 3) {
+                            matriz[tabuleiro_linha][tabuleiro_coluna] = 5; // acertou navio
+                        } else if (matriz[tabuleiro_linha][tabuleiro_coluna] == 0) {
+                            matriz[tabuleiro_linha][tabuleiro_coluna] = 1; // acertou água
+                        }
+                    }
+                }
+            }
+        }
+
+        // sobrepor matriz_octaedro no tabuleiro, centrando no ponto de origem
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                int tabuleiro_linha = origem_octaedro_linha - 2 + i;
+                int tabuleiro_coluna = origem_octaedro_coluna - 2 + j;
+                // Se está dentro do tabuleiro e é área de efeito da habilidade octaedro
+                if (tabuleiro_linha >= 0 && tabuleiro_linha < LINHAS && tabuleiro_coluna >= 0 && tabuleiro_coluna < COLUNAS) {
+                    if (matriz_octaedro[i][j] == 1) {
+                        if (matriz[tabuleiro_linha][tabuleiro_coluna] == 3) {
+                            matriz[tabuleiro_linha][tabuleiro_coluna] = 5; // acertou navio
+                        } else if (matriz[tabuleiro_linha][tabuleiro_coluna] == 0) {
+                            matriz[tabuleiro_linha][tabuleiro_coluna] = 1; // acertou água
+                        }
+                    }
+                }
+            }
+        }
+
 
     //se teve conflito, encerra o jogo
     if(conflito == 1){
